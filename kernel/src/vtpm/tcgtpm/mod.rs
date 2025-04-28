@@ -7,10 +7,6 @@
 //! This crate implements the virtual TPM interfaces for the TPM 2.0
 //! Reference Implementation (by Microsoft)
 
-/// Functions required to build the TPM 2.0 Reference Implementation libraries
-#[cfg(not(any(test, fuzzing)))]
-mod wrapper;
-
 extern crate alloc;
 
 use alloc::vec::Vec;

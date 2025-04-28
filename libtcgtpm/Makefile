@@ -8,11 +8,9 @@ endif
 
 DEPS_DIR = $(CURDIR)/deps
 
-LIBCRT_DIR = $(DEPS_DIR)/libcrt
 OPENSSL_DIR = $(DEPS_DIR)/openssl
 TCGTPM_DIR = $(DEPS_DIR)/tpm-20-ref/TPMCmd
 
-LIBCRT = $(LIBCRT_DIR)/libcrt.a
 LIBCRYPTO = $(OPENSSL_DIR)/libcrypto.a
 
 LIBTPM_A = tpm/src/libtpm.a
@@ -24,7 +22,7 @@ LIBPLATFORM = $(TCGTPM_DIR)/$(LIBPLATFORM_A)
 OPENSSL_MAKEFILE = $(OPENSSL_DIR)/Makefile
 TCGTPM_MAKEFILE = $(TCGTPM_DIR)/Makefile
 
-LIBS = $(LIBCRT) $(LIBCRYPTO) $(LIBTPM) $(LIBPLATFORM)
+LIBS = $(LIBCRYPTO) $(LIBTPM) $(LIBPLATFORM)
 
 OUT_DIR ?= $(CWD)
 
@@ -34,12 +32,8 @@ $(OUT_DIR)/libtcgtpm.a: $(LIBS)
 	rm -f $@
 	ar rcsTPD $@ $^
 
-# libcrt
-$(LIBCRT):
-	$(MAKE) -C $(LIBCRT_DIR)
-
 # openssl
-$(LIBCRYPTO): $(OPENSSL_MAKEFILE) $(LIBCRT)
+$(LIBCRYPTO): $(OPENSSL_MAKEFILE)
 	$(MAKE) -C $(OPENSSL_DIR) -j$$(nproc)
 
 $(OPENSSL_MAKEFILE):
@@ -95,8 +89,9 @@ $(OPENSSL_MAKEFILE):
 			no-asm \
 			--with-rand-seed=getrandom \
 			$(OPENSSL_CONFIG_TYPE) \
-			-I$(LIBCRT_DIR)/include \
-			-Wl,rpath=$(LIBCRT_DIR) -lcrt)
+			$(DEP_LIBCRT_CPPFLAGS) \
+			-L$(DEP_LIBCRT_LINK_SEARCH) \
+			-l$(DEP_LIBCRT_LINK_LIB)
 
 # tcgtpm
 $(LIBTPM): $(TCGTPM_MAKEFILE) $(LIBCRYPTO)
@@ -107,7 +102,7 @@ $(LIBPLATFORM): $(TCGTPM_MAKEFILE) $(LIBCRYPTO)
 
 TCGTPM_CFLAGS += -static -nostdinc -fno-stack-protector -fPIE -mno-sse -mno-red-zone
 TCGTPM_CFLAGS += -DFILE_BACKED_NV=NO
-TCGTPM_CFLAGS += -I$(LIBCRT_DIR)/include
+TCGTPM_CFLAGS += $(DEP_LIBCRT_CPPFLAGS)
 TCGTPM_CFLAGS += -I$(OPENSSL_DIR)/include
 # This is needed to workaround an issue with an unused variable when
 # FILE_BACKED_NV is set to NO. The real fix is posted here:
@@ -131,11 +126,10 @@ $(TCGTPM_MAKEFILE):
 		./configure \
 			EXTRA_CFLAGS="${TCGTPM_EXTRA_CFLAGS}" \
 			CFLAGS="${TCGTPM_CFLAGS}" \
-			LIBCRYPTO_LIBS="$(LIBCRT) $(LIBCRYPTO)" \
+			LIBCRYPTO_LIBS="$(LIBCRYPTO)" \
 			LIBCRYPTO_CFLAGS="${TCGTPM_CFLAGS}")
 
 clean: $(OPENSSL_MAKEFILE) $(TCGTPM_MAKEFILE)
-	make -C $(LIBCRT_DIR) clean
 	make -C $(OPENSSL_DIR) clean
 	make -C $(TCGTPM_DIR) clean
 	rm -f libtcgtpm.a

@@ -41,6 +41,9 @@ pub mod types;
 pub mod utils;
 #[cfg(all(feature = "vtpm", not(test)))]
 pub mod vtpm;
+// SVSM specific functions needed for a C runtime environment.
+#[cfg(not(any(test, fuzzing)))]
+mod crt;
 
 #[test]
 fn test_nop() {}

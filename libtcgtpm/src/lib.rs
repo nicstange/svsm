@@ -9,6 +9,9 @@
 
 #![no_std]
 
+// Record a dependency, it will get pruned (and possibly warned about) otherwise.
+use libcrt as _;
+
 /// C bindings
 pub mod bindings {
     #![allow(non_upper_case_globals)]

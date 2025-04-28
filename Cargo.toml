@@ -11,6 +11,8 @@ members = [
     "fuzz",
     # ELF loader
     "elf",
+    # Minimum C runtime
+    "libcrt",
     # TPM 2.0 Reference Implementation library
     "libtcgtpm",
     # syscall interface definitions
@@ -36,6 +38,7 @@ cpuarch = { path = "cpuarch" }
 test = { path = "test" }
 svsm = { path = "kernel" }
 elf = { path = "elf" }
+libcrt = { path = "libcrt" }
 libtcgtpm = { path = "libtcgtpm" }
 syscall = { path = "syscall" }
 packit = { path = "packit" }

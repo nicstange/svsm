@@ -6,7 +6,7 @@ else
 CFLAGS = -g -O0
 endif
 
-CFLAGS += -I./include -nostdinc -nostdlib -mno-red-zone
+CFLAGS += -I$(VPATH)/include -nostdinc -nostdlib -mno-red-zone
 CFLAGS += -m64 -march=x86-64 -mno-sse2 -fPIE
 CFLAGS += -fno-stack-protector
 CFLAGS += -ffreestanding
@@ -94,9 +94,11 @@ libcrt.a: $(OBJS)
 	ar rcs $@ $(OBJS)
 
 %.o : %.c
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 %.o : %.s
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 clean:
