@@ -187,6 +187,8 @@ extern _Noreturn void abort(void);
 int atoi(const char *s);
 int atexit(void (*func)(void));
 
+void *bsearch(const void *key, const void *base, size_t nel, size_t width, int (*cmp)(const void *, const void *));
+
 void qsort(void *, size_t, size_t,  int (*)(const void *, const void *));
 void qsort_r(void *, size_t, size_t, int (*)(const void *, const void *, void *), void *);
 void __qsort_r(void *, size_t, size_t, int (*)(const void *, const void *, void *), void *);

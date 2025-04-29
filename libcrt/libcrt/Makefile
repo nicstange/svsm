@@ -51,6 +51,7 @@ OBJS += $(addprefix src/stdio/, \
 # stdlib
 OBJS += $(addprefix src/stdlib/, \
 				atoi.o \
+				bsearch.o \
 				qsort.o \
 				qsort_nr.o \
 				)
