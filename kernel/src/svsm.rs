@@ -50,6 +50,13 @@ use svsm::vtpm::vtpm_init;
 
 use svsm::mm::validate::{init_valid_bitmap_ptr, migrate_valid_bitmap};
 
+use cocoon_tpm_crypto::{ecc, rng::{self, RngCore as _}, CryptoError, EmptyCryptoIoSlices};
+use cocoon_tpm_tpm2_interface::{TpmEccCurve, TpmiAlgHash, TpmsEccPoint};
+use cocoon_tpm_utils_common::{
+    alloc::try_alloc_zeroizing_vec,
+    io_slices::{self, IoSlicesIterCommon as _},
+};
+
 use release::COCONUT_VERSION;
 
 extern "C" {
@@ -283,6 +290,35 @@ extern "C" fn svsm_start(li: &KernelLaunchInfo, vb_addr: usize) -> ! {
     unreachable!("SVSM entry point terminated unexpectedly");
 }
 
+#[cfg(not(feature = "boringssl"))]
+fn demo_rng() -> rng::HashDrbg {
+    // Error here if rdseed is unsupported.
+    let mut rdseed_rng = rng::X86RdSeedRng::instantiate()
+        .map_err(|_| CryptoError::RngFailure)
+        .unwrap();
+    let hash_drbg_entropy_len = rng::HashDrbg::min_seed_entropy_len(TpmiAlgHash::Sha256);
+    let mut hash_drbg_entropy = try_alloc_zeroizing_vec(hash_drbg_entropy_len).unwrap();
+    rdseed_rng
+        .generate::<_, EmptyCryptoIoSlices>(
+            io_slices::SingletonIoSliceMut::new(hash_drbg_entropy.as_mut_slice())
+                .map_infallible_err(),
+            None,
+        )
+        .unwrap();
+    rng::HashDrbg::instantiate(
+        TpmiAlgHash::Sha256,
+        &hash_drbg_entropy,
+        None, // Nonce. Could be some id unique to the VM instance.
+        Some(b"SVSM primary rng"),
+    )
+    .unwrap()
+}
+
+#[cfg(feature = "boringssl")]
+fn demo_rng() -> rng::BsslRandBytesRng {
+    rng::BsslRandBytesRng::new()
+}
+
 #[no_mangle]
 pub extern "C" fn svsm_main() {
     // If required, the GDB stub can be started earlier, just after the console
@@ -343,6 +379,32 @@ pub extern "C" fn svsm_main() {
     vtpm_init().expect("vTPM failed to initialize");
 
     virt_log_usage();
+
+    // Generate some random bytes for demo purposes.
+    let mut rng_out = [0u8; 16];
+    let mut rng = demo_rng();
+    rng::rng_dyn_dispatch_generate(
+        &mut rng,
+        io_slices::SingletonIoSliceMut::new(&mut rng_out).map_infallible_err(),
+        None,
+    )
+    .unwrap();
+    log::info!("test rng output = {:02x?}", rng_out);
+
+    // Generate an ECC key for demo purposes.
+    let curve = ecc::curve::Curve::new(TpmEccCurve::NistP521).unwrap();
+    let curve_ops = curve.curve_ops().unwrap();
+    let ecc_key = ecc::EccKey::generate(&curve_ops, &mut rng, None).unwrap();
+    let (pub_key, priv_key) = ecc_key.into_tpms(&curve_ops).unwrap();
+    // The key had just been generated, so it does have a private part.
+    let priv_key = priv_key.unwrap();
+    let TpmsEccPoint {
+        x: pub_key_x,
+        y: pub_key_y,
+    } = pub_key;
+    log::info!("pub.x = {:02x?}", pub_key_x);
+    log::info!("pub.x = {:02x?}", pub_key_y);
+    log::info!("priv  = {:02x?}", priv_key);
 
     if let Err(e) = SVSM_PLATFORM.launch_fw(&config) {
         panic!("Failed to launch FW: {e:#?}");
