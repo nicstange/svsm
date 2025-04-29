@@ -73,7 +73,9 @@
 
 extern int errno;
 #define EINTR         4
+#define EAGAIN        11
 #define ENOMEM        12
+#define EBUSY         16
 #define EINVAL        22
 #define ENOSYS        38
 #define EAFNOSUPPORT  47

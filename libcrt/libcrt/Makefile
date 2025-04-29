@@ -88,6 +88,27 @@ OBJS += $(addprefix src/time/, \
 				gmtime_r.o \
 				time.o \
 				)
+# thread
+OBJS += $(addprefix src/thread/, \
+				pthread_cleanup_push.o \
+				pthread_mutex_lock.o \
+				pthread_mutex_timedlock.o \
+				pthread_mutex_trylock.o \
+				pthread_mutex_unlock.o \
+				pthread_once.o \
+				pthread_rwlock_destroy.o \
+				pthread_rwlock_init.o \
+				pthread_rwlock_rdlock.o \
+				pthread_rwlock_timedrdlock.o \
+				pthread_rwlock_timedwrlock.o \
+				pthread_rwlock_tryrdlock.o \
+				pthread_rwlock_trywrlock.o \
+				pthread_rwlock_unlock.o \
+				pthread_rwlock_wrlock.o \
+				stub.o \
+				__timedwait.o \
+				__wait.o \
+				)
 
 all: libcrt.a
 

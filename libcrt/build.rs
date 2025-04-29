@@ -60,6 +60,16 @@ fn main() {
             .into_string()
             .unwrap()
     );
+    // Define $DEP_LIBCRT_PTHREAD_CPPFLAGS for dependant packages.
+    println!(
+        "cargo::metadata=PTHREAD_CPPFLAGS=-I{}",
+        libcrt_src_path
+            .join("include")
+            .join("pthread")
+            .into_os_string()
+            .into_string()
+            .unwrap()
+    );
     // Define $DEP_LIBCRT_LINK_SEARCH for dependant packages.
     println!("cargo::metadata=LINK_SEARCH={}", out_dir);
     // Define $DEP_LIBCRT_LINK_LIB for dependant packages.
