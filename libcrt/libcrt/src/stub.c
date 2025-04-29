@@ -107,6 +107,11 @@ long ftell(FILE *stream)
     return -1;
 }
 
+void perror(const char *s)
+{
+    NOT_IMPLEMENTED;
+}
+
 // stdlib.h
 
 long strtol(const char *nptr, char **endptr, int base)

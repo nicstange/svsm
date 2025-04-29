@@ -379,6 +379,8 @@ int clearerr(FILE *stream);
 int fseek(FILE *stream, long offset, int whence);
 long ftell(FILE *stream);
 
+void perror(const char *s);
+
 int vasprintf(char **s, const char *fmt, va_list ap);
 int asprintf(char **s, const char *fmt, ...);
 int vsnprintf(char *restrict s, size_t n, const char *restrict fmt, va_list ap);
