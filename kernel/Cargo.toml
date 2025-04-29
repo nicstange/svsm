@@ -43,12 +43,19 @@ vstd = { workspace = true }
 verify_proof = { workspace = true, optional = true}
 verify_external = { workspace = true, optional = true}
 
+cocoon-tpm-utils-common = { git = "https://github.com/nicstange/cocoon-tpm.git" }
+cocoon-tpm-tpm2-interface = { git = "https://github.com/nicstange/cocoon-tpm.git" }
+cocoon-tpm-crypto = { git = "https://github.com/nicstange/cocoon-tpm.git" }
+bssl-bare-sys = { git = "https://github.com/nicstange/cocoon-tpm.git", optional = true, features = ["target-integration"] }
+sha2 = { version = "0.10.6", default-features = false, features = ["force-soft"] }
+
 [target."x86_64-unknown-none".dev-dependencies]
 test.workspace = true
 
 [features]
 default = []
 enable-gdb = ["dep:gdbstub", "dep:gdbstub_arch"]
+boringssl = [ "cocoon-tpm-crypto/boringssl", "dep:bssl-bare-sys" ]
 vtpm = ["dep:libtcgtpm"]
 nosmep = []
 nosmap = []

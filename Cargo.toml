@@ -28,6 +28,8 @@ members = [
     "user/init",
     # Release version identifier
     "release",
+    # BoringSSL integration
+    "bssl-bare-sys-target-integration",
 ]
 
 
@@ -45,6 +47,7 @@ packit = { path = "packit" }
 userlib = { path = "user/lib" }
 userinit = { path = "user/init" }
 release = { path = "release" }
+bssl-bare-sys-target-integration = { path = "bssl-bare-sys-target-integration" }
 
 # crates.io
 aes-gcm = { version = "0.10.3", default-features = false }
@@ -115,3 +118,6 @@ unnecessary_box_returns = "warn"
 
 [workspace.metadata.scripts]
 vfmt = "verusfmt `find ./ -name *.verus.rs`"
+
+[patch.'https://github.com/nicstange/cocoon-tpm']
+bssl-bare-sys-target-integration = { path = "bssl-bare-sys-target-integration" }
