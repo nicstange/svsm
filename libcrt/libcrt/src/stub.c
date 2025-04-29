@@ -17,6 +17,14 @@ char *strerror(int errnum)
     return NULL;
 }
 
+
+int *__errno_location(void)
+{
+    // It *is* racy, but that's inherent to having only a single
+    // errno copy.
+    return &errno;
+}
+
 // stdio.h
 
 int sscanf(const char  *buffer, const char  *format, ...)
