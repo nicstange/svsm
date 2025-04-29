@@ -55,10 +55,34 @@ int fputc(int c, FILE *f)
     return 0;
 }
 
+int fputs(const char *s, FILE *stream)
+{
+    NOT_IMPLEMENTED;
+    return EOF;
+}
+
+char* fgets(char *s, int size, FILE *stream)
+{
+    NOT_IMPLEMENTED;
+    *s = '\0';
+    return NULL;
+}
+
+int fflush(FILE *stream)
+{
+    NOT_IMPLEMENTED;
+    return EOF;
+}
 
 void setbuf(FILE *stream, char *buf)
 {
     NOT_IMPLEMENTED;
+}
+
+int feof(FILE *stream)
+{
+    NOT_IMPLEMENTED;
+    return 1;
 }
 
 int ferror(FILE *stream) {
@@ -69,6 +93,18 @@ int ferror(FILE *stream) {
 int clearerr(FILE *stream) {
 	NOT_IMPLEMENTED;
 	return -1;
+}
+
+int fseek(FILE *stream, long offset, int whence)
+{
+    NOT_IMPLEMENTED;
+    return -1;
+}
+
+long ftell(FILE *stream)
+{
+    NOT_IMPLEMENTED;
+    return -1;
 }
 
 // stdlib.h
